@@ -50,11 +50,6 @@ export default function TaskList({ tasks, onDeleteTask }) {
           <CheckCircle className="w-4 h-4 text-emerald-600" />
           Dấu vết thực tiễn ({tasks.length})
         </h3>
-        {tasks.length > 0 && (
-          <span className="text-[11px] bg-emerald-500/20 text-emerald-600 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
-            Chi tiết nhân quả ▾
-          </span>
-        )}
       </div>
 
       {tasks.length === 0 ? (
@@ -77,11 +72,10 @@ export default function TaskList({ tasks, onDeleteTask }) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className={`rounded-2xl border transition-all overflow-hidden ${
-                    isActive
+                  className={`rounded-2xl border transition-all overflow-hidden ${isActive
                       ? "bg-white/40 border-emerald-500/30 shadow-md"
                       : "bg-white/10 hover:bg-white/20 border-white/5 shadow-sm"
-                  }`}
+                    }`}
                 >
                   {/* Task Header info */}
                   <div
@@ -90,15 +84,14 @@ export default function TaskList({ tasks, onDeleteTask }) {
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        className={`w-2 h-2 rounded-full shrink-0 ${
-                          isNegative ? "bg-red-500" : "bg-emerald-600 animate-pulse"
-                        }`}
+                        className={`w-2 h-2 rounded-full shrink-0 ${isNegative ? "bg-red-500" : "bg-emerald-600 animate-pulse"
+                          }`}
                       />
                       <div className="min-w-0">
                         <p className={`text-[13px] font-bold truncate ${isNegative ? "text-red-700" : "text-slate-800"}`}>
                           {task.text}
                         </p>
-                        
+
                         {/* Nuôi dưỡng & Phẩm chất details */}
                         <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1 text-[10px] text-slate-500 items-center">
                           <span className="font-semibold text-slate-600">🌱 {getSeedName(task.analysis.category)}</span>
@@ -199,11 +192,10 @@ export default function TaskList({ tasks, onDeleteTask }) {
                                 return (
                                   <span
                                     key={key}
-                                    className={`text-[8.5px] font-bold px-1.5 py-0.5 rounded ${
-                                      isPos
+                                    className={`text-[8.5px] font-bold px-1.5 py-0.5 rounded ${isPos
                                         ? "bg-green-500/20 text-green-300"
                                         : "bg-red-500/20 text-red-300"
-                                    }`}
+                                      }`}
                                   >
                                     {key.toUpperCase()} {isPos ? `+${val}` : val}
                                   </span>
