@@ -1,6 +1,6 @@
-// Gemini AI Service - Kết nối với Google Gemini API
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+// Groq AI Service (Grok) - Kết nối với Groq API (OpenAI Compatible)
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || "";
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 // Retry helper - chờ rồi thử lại khi bị rate limit
 async function fetchWithRetry(url, options, maxRetries = 2) {
@@ -8,9 +8,8 @@ async function fetchWithRetry(url, options, maxRetries = 2) {
     const response = await fetch(url, options);
 
     if (response.status === 429 && attempt < maxRetries) {
-      // Rate limited - chờ rồi thử lại
       const waitTime = (attempt + 1) * 2000; // 2s, 4s
-      console.warn(`⏳ Gemini rate limited, chờ ${waitTime / 1000}s rồi thử lại...`);
+      console.warn(`⚠️ Groq rate limited, chờ ${waitTime / 1000}s rồi thử lại...`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
       continue;
     }
@@ -20,92 +19,91 @@ async function fetchWithRetry(url, options, maxRetries = 2) {
 }
 
 /**
- * Gọi Gemini API với prompt (trả về JSON)
+ * Gọi Groq API với prompt (trả về JSON)
  */
-export async function callGemini(systemPrompt, userMessage) {
+export async function callGrok(systemPrompt, userMessage) {
   try {
-    const response = await fetchWithRetry(GEMINI_API_URL, {
+    const response = await fetchWithRetry(GROQ_API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${GROQ_API_KEY}`
+      },
       body: JSON.stringify({
-        system_instruction: {
-          parts: [{ text: systemPrompt }]
-        },
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: userMessage }]
-          }
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage }
         ],
-        generationConfig: {
-          temperature: 0.8,
-          maxOutputTokens: 2048,
-          responseMimeType: "application/json"
-        }
+        temperature: 0.8,
+        max_tokens: 2048,
+        response_format: { type: "json_object" }
       })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Gemini API Error:", response.status, errorText);
-      throw new Error(`Gemini API Error: ${response.status}`);
+      console.error("Groq API Error:", response.status, errorText);
+      throw new Error(`Groq API Error: ${response.status}`);
     }
 
     const data = await response.json();
-    const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const textContent = data.choices?.[0]?.message?.content;
 
     if (!textContent) {
-      throw new Error("Gemini trả về dữ liệu rỗng");
+      throw new Error("Groq trả về dữ liệu rỗng");
     }
 
     return JSON.parse(textContent);
   } catch (error) {
-    console.error("Gemini Service Error:", error);
+    console.error("Groq Service Error:", error);
     throw error;
   }
 }
 
 /**
- * Gọi Gemini API cho đối thoại (multi-turn, trả về text thuần)
+ * Gọi Groq API cho đối thoại (multi-turn, trả về text thuần)
  */
-export async function callGeminiChat(systemPrompt, conversationHistory) {
+export async function callGrokChat(systemPrompt, conversationHistory) {
   try {
-    const contents = conversationHistory.map(msg => ({
-      role: msg.role === "ai" ? "model" : "user",
-      parts: [{ text: msg.text }]
-    }));
+    const messages = [
+      { role: "system", content: systemPrompt },
+      ...conversationHistory.map(msg => ({
+        role: msg.role === "ai" ? "assistant" : "user",
+        content: msg.text
+      }))
+    ];
 
-    const response = await fetchWithRetry(GEMINI_API_URL, {
+    const response = await fetchWithRetry(GROQ_API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${GROQ_API_KEY}`
+      },
       body: JSON.stringify({
-        system_instruction: {
-          parts: [{ text: systemPrompt }]
-        },
-        contents,
-        generationConfig: {
-          temperature: 0.9,
-          maxOutputTokens: 1024,
-        }
+        model: "llama-3.3-70b-versatile",
+        messages,
+        temperature: 0.9,
+        max_tokens: 1024
       })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Gemini Chat API Error:", response.status, errorText);
-      throw new Error(`Gemini API Error: ${response.status}`);
+      console.error("Groq Chat API Error:", response.status, errorText);
+      throw new Error(`Groq API Error: ${response.status}`);
     }
 
     const data = await response.json();
-    const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const textContent = data.choices?.[0]?.message?.content;
 
     if (!textContent) {
-      throw new Error("Gemini trả về dữ liệu rỗng");
+      throw new Error("Groq trả về dữ liệu rỗng");
     }
 
     return textContent.trim();
   } catch (error) {
-    console.error("Gemini Chat Error:", error);
+    console.error("Groq Chat Error:", error);
     throw error;
   }
 }

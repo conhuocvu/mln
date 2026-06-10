@@ -322,9 +322,9 @@ export function detectContradictions(completedTasks, activeGoals) {
 
 export async function analyzeTask(taskText) {
   try {
-    const { callGemini, TASK_ANALYZER_PROMPT } = await import('../services/geminiService.js');
+    const { callGrok, TASK_ANALYZER_PROMPT } = await import('../services/grokService.js');
     
-    const result = await callGemini(TASK_ANALYZER_PROMPT, `Phân tích hành động sau: "${taskText}"`);
+    const result = await callGrok(TASK_ANALYZER_PROMPT, `Phân tích hành động sau: "${taskText}"`);
     
     // Validate cấu trúc kết quả từ AI
     if (result && result.category && result.thayDoiChiSo && result.nguyenNhan) {
@@ -354,13 +354,13 @@ export async function analyzeTask(taskText) {
         result.khaiNiemTrieuHoc = ["Phép biện chứng", "Thực tiễn"];
       }
       
-      console.log("✅ Gemini AI phân tích thành công:", result.category);
+      console.log("✅ Groq AI phân tích thành công:", result.category);
       return result;
     }
     
     throw new Error("Kết quả AI không hợp lệ");
   } catch (error) {
-    console.warn("⚠️ Gemini API lỗi, dùng phân tích cục bộ:", error.message);
+    console.warn("⚠️ Groq API lỗi, dùng phân tích cục bộ:", error.message);
     return analyzeTaskMock(taskText);
   }
 }

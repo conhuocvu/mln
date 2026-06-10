@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, FileText, Send, MessageSquare, AlertCircle, History, Sparkles, HelpCircle, X, Check } from 'lucide-react';
-import { callGeminiChat, callGemini, SOCRATIC_SYSTEM_PROMPT, SOCRATIC_SYNTHESIS_PROMPT } from '../services/geminiService';
+import { callGrokChat, callGrok, SOCRATIC_SYSTEM_PROMPT, SOCRATIC_SYNTHESIS_PROMPT } from '../services/grokService';
 
 export default function PhilosophyJournal({ completedTasks, stats, journalHistory, onSaveJournal, activeGoals, contradictionAnalysis, latestTask }) {
   const [reflectionStep, setReflectionStep] = useState(null); // null, 'chatting', 'synthesizing', 'result'
@@ -46,7 +46,7 @@ ${contradictionAnalysis?.hasContradiction ? `Mâu thuẫn hiện tại: ${contra
         ? [{ role: "user", text: `Hãy bắt đầu đối thoại Socratic. Tôi vừa thực hiện: "${task?.text || 'không có hành động'}"` }]
         : conversation;
 
-      const response = await callGeminiChat(systemWithContext, fullConversation);
+      const response = await callGrokChat(systemWithContext, fullConversation);
       return response;
     } catch (error) {
       console.error("Lỗi gọi Socrates AI:", error);
@@ -147,7 +147,7 @@ ${contradictionAnalysis?.hasContradiction ? `Mâu thuẫn hiện tại: ${contra
 
         const synthesisPrompt = `Cuộc đối thoại Socratic vừa diễn ra:\n\n${conversationSummary}\n\nHành động gốc: "${selectedEvent?.text || 'không có'}"\nPhân loại: ${selectedEvent?.analysis?.category || 'other'}`;
 
-        const synthesis = await callGemini(SOCRATIC_SYNTHESIS_PROMPT, synthesisPrompt);
+        const synthesis = await callGrok(SOCRATIC_SYNTHESIS_PROMPT, synthesisPrompt);
         
         if (synthesis && synthesis.hienTuong) {
           setSynthesisResult(synthesis);
