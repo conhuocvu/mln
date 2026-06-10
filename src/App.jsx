@@ -279,19 +279,6 @@ export default function App() {
         }));
       }
 
-      // Hoàn thành mục tiêu
-      goals.forEach((goal) => {
-        const matchingTasksCount = updatedTasks.filter(t => t.analysis.category === goal.category).length;
-        const previouslyCompleted = tasks.filter(t => t.analysis.category === goal.category).length >= goal.requiredCount;
-        
-        if (matchingTasksCount >= goal.requiredCount && !previouslyCompleted) {
-          setStats(prev => ({
-            ...prev,
-            completedGoalsCount: (prev.completedGoalsCount || 0) + 1,
-            qualityBreakthroughsCount: (prev.qualityBreakthroughsCount || 0) + 1
-          }));
-        }
-      });
 
       // Hiển thị biến động thực tế trong vườn dưới dạng phản tư sinh động
       triggerWhisper(`🌱 Sự kiện nhân sinh: ${analysis.suKienVuon}`);
