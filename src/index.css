@@ -1,0 +1,313 @@
+@import "tailwindcss";
+
+/* Override Tailwind font stacks for Vietnamese support */
+@layer base {
+  .font-serif {
+    font-family: 'Noto Serif', 'Georgia', serif !important;
+  }
+  .font-sans {
+    font-family: 'Inter', 'Outfit', system-ui, -apple-system, sans-serif !important;
+  }
+}
+
+@theme {
+  --color-phil-primary: #5B7F68;
+  --color-phil-secondary: #9EB89A;
+  --color-phil-accent: #D7B377;
+  --color-phil-earth: #7B5E57;
+  --color-phil-bg: #F3F0E8;
+  --color-phil-text: #2F3A34;
+
+  --color-garden-green-50: #F3F0E8;
+  --color-garden-green-100: #E4ECE7;
+  --color-garden-green-200: #C8DCD0;
+  --color-garden-green-300: #9EB89A;
+  --color-garden-green-400: #7DA68B;
+  --color-garden-green-500: #5B7F68;
+  --color-garden-green-600: #4B6B56;
+  --color-garden-green-700: #3B5444;
+  --color-garden-green-800: #2F3A34;
+
+  --color-garden-wood-50: #FAF8F5;
+  --color-garden-wood-100: #F3EDE7;
+  --color-garden-wood-200: #E3D5CA;
+  --color-garden-wood-300: #C5A894;
+  --color-garden-wood-400: #A28271;
+  --color-garden-wood-500: #7B5E57;
+  --color-garden-wood-600: #684F49;
+  --color-garden-wood-700: #543F3A;
+  --color-garden-wood-800: #43322E;
+
+  --color-garden-cream-50: #FAF8F5;
+  --color-garden-cream-100: #F5EFEB;
+  --color-garden-cream-200: #EDE4DC;
+  --color-garden-cream-300: #E0D4C8;
+
+  --color-garden-pastel-yellow: #FFFDE7;
+  --color-garden-pastel-blue: #E3F2FD;
+  --color-garden-pastel-pink: #FCE4EC;
+  --color-garden-pastel-purple: #F3E5F5;
+
+  --animate-wind-sway: sway 4s ease-in-out infinite alternate;
+  --animate-leaf-shake: shake 2s ease-in-out infinite alternate;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-rain-fall: rain 0.8s linear infinite;
+  --animate-butterfly-fly: butterfly 4s ease-in-out infinite alternate;
+
+  @keyframes sway {
+    0% { transform: rotate(-1deg); }
+    100% { transform: rotate(1deg); }
+  }
+  @keyframes shake {
+    0% { transform: rotate(-3deg); }
+    100% { transform: rotate(3deg); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes rain {
+    0% { transform: translateY(-20px); }
+    100% { transform: translateY(600px); }
+  }
+  @keyframes butterfly {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(15px, -15px) rotate(15deg); }
+    100% { transform: translate(-10px, -25px) rotate(-10deg); }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-garden-cream-50 text-slate-800 font-sans antialiased overflow-x-hidden selection:bg-garden-green-200 selection:text-garden-green-800;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #BCAAA4;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8D6E63;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-dark {
+  background: rgba(246, 243, 236, 0.92) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(91, 127, 104, 0.24) !important;
+  box-shadow: 0 8px 30px rgba(47, 58, 52, 0.08) !important;
+  color: #2F3A34 !important;
+}
+
+.glass-dark text, 
+.glass-dark h1, 
+.glass-dark h2, 
+.glass-dark h3, 
+.glass-dark h4, 
+.glass-dark p, 
+.glass-dark span, 
+.glass-dark label {
+  color: #2F3A34;
+}
+
+.glass-dark .text-slate-100, 
+.glass-dark .text-slate-200, 
+.glass-dark .text-white,
+.glass-dark .text-white\/90 {
+  color: #2F3A34 !important;
+}
+
+.glass-dark .text-slate-300, 
+.glass-dark .text-slate-400, 
+.glass-dark .text-slate-500,
+.glass-dark .text-indigo-300,
+.glass-dark .text-blue-300 {
+  color: #556E5D !important;
+}
+
+.glass-dark input {
+  color: #2F3A34 !important;
+  background: rgba(91, 127, 104, 0.06) !important;
+  border: 1px solid rgba(91, 127, 104, 0.2) !important;
+}
+
+.glass-dark input::placeholder {
+  color: #8CA093 !important;
+}
+
+.glass-dark select {
+  color: #2F3A34 !important;
+  background: #F6F3EC !important;
+  border: 1px solid rgba(91, 127, 104, 0.2) !important;
+}
+
+.glass-dark option {
+  background: #F6F3EC !important;
+  color: #2F3A34 !important;
+}
+
+.dark-glass {
+  background: rgba(46, 125, 50, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(46, 125, 50, 0.1);
+}
+
+/* Pulse animation for active causal chain nodes */
+@keyframes causal-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(76, 175, 80, 0);
+  }
+}
+
+.animate-causal {
+  animation: causal-pulse 2s infinite;
+}
+
+/* Custom drawing animation for SVG */
+.draw-path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw 3s ease-out forwards;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Water wave ripple */
+@keyframes ripple {
+  0% {
+    d: path("M 0 550 Q 200 540 400 550 T 800 550 L 800 600 L 0 600 Z");
+  }
+  50% {
+    d: path("M 0 545 Q 200 555 400 545 T 800 545 L 800 600 L 0 600 Z");
+  }
+  100% {
+    d: path("M 0 550 Q 200 540 400 550 T 800 550 L 800 600 L 0 600 Z");
+  }
+}
+
+.animate-ripple {
+  animation: ripple 6s ease-in-out infinite;
+}
+
+/* Clouds slide */
+@keyframes slide-cloud-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-40px);
+  }
+}
+
+@keyframes slide-cloud-right {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(40px);
+  }
+}
+
+.animate-cloud-left {
+  animation: slide-cloud-left 15s ease-in-out infinite alternate;
+}
+
+.animate-cloud-right {
+  animation: slide-cloud-right 20s ease-in-out infinite alternate;
+}
+
+/* Shimmer effect for achievements */
+@keyframes shimmer {
+  100% {
+    transform: skewX(-12deg) translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ===== WHISPER BUBBLE — Cây Thì Thầm Triết Học ===== */
+
+.whisper-bubble {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.whisper-bubble-inner {
+  background: rgba(15, 25, 22, 0.85); /* Dark forest glassmorphism for maximum contrast */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.3); /* Premium glowing emerald border */
+  border-radius: 20px;
+  padding: 12px 18px;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.5),
+    0 0 20px 2px rgba(16, 185, 129, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  max-width: 260px;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.whisper-icon {
+  color: #FFF9C4;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  animation: whisper-icon-pulse 3s ease-in-out infinite;
+  text-shadow: 0 0 8px rgba(255, 249, 196, 0.6);
+}
+
+.whisper-text {
+  font-family: 'Outfit', sans-serif;
+  font-style: italic;
+  font-weight: 500; /* Bolder font weight for crisp readability */
+  font-size: 12.5px; /* Slightly larger text */
+  line-height: 1.65;
+  color: #F1F5F9; /* Off-white for high contrast and readability */
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+@keyframes whisper-icon-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
