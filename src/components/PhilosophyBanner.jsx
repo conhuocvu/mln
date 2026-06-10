@@ -28,7 +28,7 @@ export default function PhilosophyBanner() {
   const [quoteText, quoteAuthor] = currentQuoteRaw.split(' — ');
 
   return (
-    <div className="absolute bottom-26 left-1/2 -translate-x-1/2 z-25 max-w-[500px] w-[90%] md:w-auto pointer-events-none select-none">
+    <div className="absolute top-[88px] left-1/2 -translate-x-1/2 z-25 max-w-[500px] w-[90%] md:w-auto pointer-events-none select-none">
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

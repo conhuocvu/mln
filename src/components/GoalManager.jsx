@@ -16,18 +16,22 @@ export default function GoalManager({ goals, onAddGoal, onDeleteGoal, completedT
   const [category, setCategory] = useState("study");
   const [currentReality, setCurrentReality] = useState("");
   const [newReality, setNewReality] = useState("");
+  const [targetCount, setTargetCount] = useState(10);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim() || !currentReality.trim() || !newReality.trim()) return;
 
-    // Thiết lập điều kiện cần ngẫu nhiên lành mạnh (yêu cầu số lượng công việc hoàn thành)
-    const requiredCount = category === "study" ? 6 : category === "health" ? 5 : 4;
+    const requiredCount = targetCount;
     const conditionNeeded = category === "study" 
       ? `Tích lũy ${requiredCount} ngày tự học` 
       : category === "health" 
         ? `Tập thể dục/vận động ${requiredCount} lần` 
-        : `Tích lũy ${requiredCount} ngày kết nối chia sẻ`;
+        : category === "mind"
+          ? `Tích lũy ${requiredCount} ngày phản tư`
+          : category === "relationship"
+            ? `Tích lũy ${requiredCount} ngày kết nối chia sẻ`
+            : `Hoàn thành ${requiredCount} hành động sáng tạo/khác`;
 
     onAddGoal({
       id: `goal-${Date.now()}`,
@@ -44,6 +48,7 @@ export default function GoalManager({ goals, onAddGoal, onDeleteGoal, completedT
     setTitle("");
     setCurrentReality("");
     setNewReality("");
+    setTargetCount(10);
     setShowAddForm(false);
   };
 
@@ -99,6 +104,17 @@ export default function GoalManager({ goals, onAddGoal, onDeleteGoal, completedT
                     <option key={cat.value} value={cat.value} className="bg-slate-900 text-white">{cat.label}</option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Số lượng tích lũy:</label>
+                <input
+                  type="number"
+                  min="1"
+                  required
+                  value={targetCount}
+                  onChange={(e) => setTargetCount(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                  className="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                />
               </div>
             </div>
 
