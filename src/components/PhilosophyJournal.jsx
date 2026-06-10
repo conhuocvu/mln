@@ -7,7 +7,7 @@ export default function PhilosophyJournal({ completedTasks, stats, journalHistor
   const [reflectionStep, setReflectionStep] = useState(null); // null, 'chatting', 'synthesizing', 'result'
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [chatHistory, setChatHistory] = useState([]);
-  const [aiConversation, setAiConversation] = useState([]); // Lịch sử gửi cho Gemini
+  const [aiConversation, setAiConversation] = useState([]); // Lịch sử gửi cho Grok
   const [inputVal, setInputVal] = useState("");
   const [showHistory, setShowHistory] = useState(false);
   const [currentJournal, setCurrentJournal] = useState(null);
@@ -25,9 +25,9 @@ export default function PhilosophyJournal({ completedTasks, stats, journalHistor
     }
   }, [chatHistory, isTyping]);
 
-  // Hàm gọi Gemini AI để lấy câu hỏi Socratic
+  // Hàm gọi Grok AI để lấy câu hỏi Socratic
   const askSocrates = async (task, conversation) => {
-    const taskContext = task 
+    const taskContext = task
       ? `Người dùng vừa thực hiện hành động: "${task.text}" (phân loại: ${task.analysis?.category || 'other'}). Giải thích triết học: ${task.analysis?.giaiThich || ''}`
       : "Người dùng chưa thực hiện hành động nào hôm nay.";
 
@@ -42,7 +42,7 @@ ${contradictionAnalysis?.hasContradiction ? `Mâu thuẫn hiện tại: ${contra
 Đây là lượt hỏi thứ ${conversation.length / 2 + 1}. Hãy đặt MỘT câu hỏi Socratic sâu sắc, ngắn gọn (2-3 câu), gợi mở suy nghĩ.`;
 
     try {
-      const fullConversation = conversation.length === 0 
+      const fullConversation = conversation.length === 0
         ? [{ role: "user", text: `Hãy bắt đầu đối thoại Socratic. Tôi vừa thực hiện: "${task?.text || 'không có hành động'}"` }]
         : conversation;
 
@@ -51,7 +51,7 @@ ${contradictionAnalysis?.hasContradiction ? `Mâu thuẫn hiện tại: ${contra
     } catch (error) {
       console.error("Lỗi gọi Socrates AI:", error);
       // Fallback câu hỏi cơ bản
-      return task 
+      return task
         ? `Bạn vừa thực hiện "${task.text}". Điều gì thôi thúc bạn làm điều này hôm nay?`
         : "Hôm nay bạn cảm thấy thế nào về khu vườn nhân sinh của mình?";
     }
@@ -70,7 +70,7 @@ ${contradictionAnalysis?.hasContradiction ? `Mâu thuẫn hiện tại: ${contra
 
     // Gọi AI lấy câu hỏi đầu tiên
     setIsTyping(true);
-    
+
     // Hiện lời chào trước
     setChatHistory([
       { type: 'ai', text: `💬 Chào người chiêm nghiệm, tôi là Socrates. ${task ? `Bạn vừa thực hiện: "${task.text}".` : 'Khu vườn hôm nay tĩnh lặng.'} Hãy cùng tôi nhìn sâu vào khoảnh khắc này.` }
@@ -105,23 +105,23 @@ ${contradictionAnalysis?.hasContradiction ? `Mâu thuẫn hiện tại: ${contra
     let event = null;
     if (completedTasks && completedTasks.length > 0) {
       event = completedTasks.find(t => t.analysis?.category === "waste") ||
-              completedTasks.find(t => t.analysis?.category === "study") ||
-              completedTasks.find(t => t.analysis?.category === "health") ||
-              completedTasks[0];
+        completedTasks.find(t => t.analysis?.category === "study") ||
+        completedTasks.find(t => t.analysis?.category === "health") ||
+        completedTasks[0];
     }
     startReflectionForTask(event);
   };
 
-  // Xử lý gửi câu trả lời - gọi Gemini AI tiếp tục đối thoại
+  // Xử lý gửi câu trả lời - gọi Grok AI tiếp tục đối thoại
   const handleSendAnswer = async () => {
     if (!inputVal.trim()) return;
 
     const currentAnswer = inputVal.trim();
     setInputVal("");
-    
+
     // Thêm câu trả lời của user vào chat
     setChatHistory(prev => [...prev, { type: 'user', text: currentAnswer }]);
-    
+
     const newTurn = turnCount + 1;
     setTurnCount(newTurn);
 
@@ -133,22 +133,22 @@ ${contradictionAnalysis?.hasContradiction ? `Mâu thuẫn hiện tại: ${contra
     if (newTurn >= 3) {
       setReflectionStep('synthesizing');
       setIsTyping(true);
-      
-      setChatHistory(prev => [...prev, { 
-        type: 'ai', 
-        text: "✨ Cảm ơn bạn đã chia sẻ chân thành. Tôi sẽ đúc kết những gì chúng ta vừa khám phá..." 
+
+      setChatHistory(prev => [...prev, {
+        type: 'ai',
+        text: "✨ Cảm ơn bạn đã chia sẻ chân thành. Tôi sẽ đúc kết những gì chúng ta vừa khám phá..."
       }]);
 
       try {
         // Gọi AI đúc kết
-        const conversationSummary = updatedConversation.map(m => 
+        const conversationSummary = updatedConversation.map(m =>
           `${m.role === 'ai' ? 'Socrates' : 'Người dùng'}: ${m.text}`
         ).join('\n\n');
 
         const synthesisPrompt = `Cuộc đối thoại Socratic vừa diễn ra:\n\n${conversationSummary}\n\nHành động gốc: "${selectedEvent?.text || 'không có'}"\nPhân loại: ${selectedEvent?.analysis?.category || 'other'}`;
 
         const synthesis = await callGrok(SOCRATIC_SYNTHESIS_PROMPT, synthesisPrompt);
-        
+
         if (synthesis && synthesis.hienTuong) {
           setSynthesisResult(synthesis);
           setReflectionStep('result');
@@ -234,7 +234,7 @@ ${contradictionAnalysis?.hasContradiction ? `Mâu thuẫn hiện tại: ${contra
           <BookOpen className="w-4.5 h-4.5 text-emerald-400" />
           Đối Thoại Socratic AI
         </h3>
-        
+
         {reflectionStep === null && journalHistory.length > 0 && (
           <button
             onClick={() => setShowHistory(!showHistory)}
@@ -305,11 +305,11 @@ ${contradictionAnalysis?.hasContradiction ? `Mâu thuẫn hiện tại: ${contra
                 <span className="text-amber-400">Tổng kết</span>
               )}
             </div>
-            
+
             {/* Progress bar */}
             {reflectionStep === 'chatting' && (
               <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden mt-1.5">
-                <div 
+                <div
                   className="bg-emerald-600 h-full transition-all duration-500"
                   style={{ width: `${((turnCount) / 3) * 100}%` }}
                 />
@@ -321,11 +321,10 @@ ${contradictionAnalysis?.hasContradiction ? `Mâu thuẫn hiện tại: ${contra
               {chatHistory.map((chat, idx) => (
                 <div
                   key={`chat-msg-${idx}`}
-                  className={`flex flex-col max-w-[85%] text-xs ${
-                    chat.type === 'ai' 
-                      ? 'bg-emerald-950/40 text-stone-900 border border-emerald-900/30 rounded-2xl rounded-tl-none p-3 self-start font-serif' 
+                  className={`flex flex-col max-w-[85%] text-xs ${chat.type === 'ai'
+                      ? 'bg-emerald-950/40 text-stone-900 border border-emerald-900/30 rounded-2xl rounded-tl-none p-3 self-start font-serif'
                       : 'bg-emerald-800/15 text-emerald-950 border border-emerald-850/20 rounded-2xl rounded-tr-none p-3 self-end font-medium'
-                  }`}
+                    }`}
                 >
                   <p className="leading-relaxed whitespace-pre-line select-text">
                     {chat.text}

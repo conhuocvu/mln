@@ -2,6 +2,9 @@
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || "";
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
+const isLocal = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
 // Retry helper - chờ rồi thử lại khi bị rate limit
 async function fetchWithRetry(url, options, maxRetries = 2) {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -23,31 +26,58 @@ async function fetchWithRetry(url, options, maxRetries = 2) {
  */
 export async function callGrok(systemPrompt, userMessage) {
   try {
-    const response = await fetchWithRetry(GROQ_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage }
-        ],
-        temperature: 0.8,
-        max_tokens: 2048,
-        response_format: { type: "json_object" }
-      })
-    });
+    let data;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Groq API Error:", response.status, errorText);
-      throw new Error(`Groq API Error: ${response.status}`);
+    if (isLocal) {
+      // Direct call on localhost
+      const response = await fetchWithRetry(GROQ_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMessage }
+          ],
+          temperature: 0.8,
+          max_tokens: 2048,
+          response_format: { type: "json_object" }
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Groq API Error:", response.status, errorText);
+        throw new Error(`Groq API Error: ${response.status}`);
+      }
+
+      data = await response.json();
+    } else {
+      // Serverless proxy call in production
+      const response = await fetchWithRetry("/api/grok", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          mode: "json",
+          systemPrompt,
+          userMessage
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Vercel Proxy Error:", response.status, errorText);
+        throw new Error(`Proxy Error: ${response.status}`);
+      }
+
+      data = await response.json();
     }
 
-    const data = await response.json();
     const textContent = data.choices?.[0]?.message?.content;
 
     if (!textContent) {
@@ -66,35 +96,60 @@ export async function callGrok(systemPrompt, userMessage) {
  */
 export async function callGrokChat(systemPrompt, conversationHistory) {
   try {
-    const messages = [
-      { role: "system", content: systemPrompt },
-      ...conversationHistory.map(msg => ({
-        role: msg.role === "ai" ? "assistant" : "user",
-        content: msg.text
-      }))
-    ];
+    let data;
 
-    const response = await fetchWithRetry(GROQ_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages,
-        temperature: 0.9,
-        max_tokens: 1024
-      })
-    });
+    if (isLocal) {
+      const messages = [
+        { role: "system", content: systemPrompt },
+        ...conversationHistory.map(msg => ({
+          role: msg.role === "ai" ? "assistant" : "user",
+          content: msg.text
+        }))
+      ];
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Groq Chat API Error:", response.status, errorText);
-      throw new Error(`Groq API Error: ${response.status}`);
+      const response = await fetchWithRetry(GROQ_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages,
+          temperature: 0.9,
+          max_tokens: 1024
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Groq Chat API Error:", response.status, errorText);
+        throw new Error(`Groq API Error: ${response.status}`);
+      }
+
+      data = await response.json();
+    } else {
+      const response = await fetchWithRetry("/api/grok", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          mode: "chat",
+          systemPrompt,
+          conversationHistory
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Vercel Proxy Error:", response.status, errorText);
+        throw new Error(`Proxy Error: ${response.status}`);
+      }
+
+      data = await response.json();
     }
 
-    const data = await response.json();
     const textContent = data.choices?.[0]?.message?.content;
 
     if (!textContent) {
